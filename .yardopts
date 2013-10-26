@@ -1,0 +1,7 @@
+--title "spotify_web"
+--readme README.md
+--no-private
+lib/spotify_web.rb
+lib/spotify_web/resource.rb
+lib/spotify_web/**/*.rb -
+CHANGELOG.md LICENSE
