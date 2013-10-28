@@ -306,4 +306,5 @@ made it much easier to bring a Ruby perspective to it.
 * [em-synchrony](https://github.com/igrigorik/em-synchrony)
 * [execjs](https://github.com/sstephenson/execjs)
 * [faye-websocket-ruby](https://github.com/faye/faye-websocket-ruby)
+* [multi_xml](https://github.com/sferik/multi_xml)
 * [radix](https://github.com/rubyworks/radix)

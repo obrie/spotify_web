@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency("em-http-request")
   s.add_runtime_dependency("execjs")
   s.add_runtime_dependency("faye-websocket")
+  s.add_runtime_dependency("multi_xml")
   s.add_runtime_dependency("radix")
   s.add_development_dependency("rake")
   s.add_development_dependency("rspec", "~> 2.11")

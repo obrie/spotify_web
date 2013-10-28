@@ -9,6 +9,33 @@ module SpotifyWeb
     self.metadata_schema = Schema::Metadata::Track
     self.resource_name = 'track'
 
+    def self.from_search_result(client, attributes) #:nodoc:
+      attributes = attributes.merge(
+        'name' => attributes['title'],
+        'artist' => [{
+          :id => attributes['artist_id'],
+          :name => attributes['artist']
+        }],
+        'album' => {
+          :id => attributes['album_id'],
+          :name => attributes['album'],
+          :artist => [{
+            :id => attributes['album_artist_id'],
+            :name => attributes['album_artist']
+          }]
+        },
+        'number' => attributes['track_number'],
+        'restriction' => [attributes['restrictions']['restriction']].flatten.map do |restriction|
+          {
+            :countries_allowed => restriction['allowed'] && restriction['allowed'].split(',').join,
+            :countries_forbidden => restriction['forbidden'] && restriction['forbidden'].split(',').join
+          }
+        end
+      )
+
+      super
+    end
+
     # The title of the song
     # @return [String]
     attribute :title, :name
@@ -31,7 +58,9 @@ module SpotifyWeb
 
     # The track number on the disc
     # @return [Fixnum]
-    attribute :number
+    attribute :number do |value|
+      value.to_i
+    end
 
     # Number of seconds the song lasts
     # @return [Fixnum]
@@ -41,7 +70,9 @@ module SpotifyWeb
 
     # The relative popularity of this song on Spotify
     # @return [Fixnum]
-    attribute :popularity
+    attribute :popularity do |value|
+      value.to_f
+    end
 
     # The countries for which this song is permitted to be played
     # @return [Array<SpotifyWeb::Restriction>]

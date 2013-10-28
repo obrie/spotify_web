@@ -25,8 +25,22 @@ module SpotifyWeb
       uri_id == 'starred' ? 'Starred' : @name
     end
 
+    # The unique URI representing this playlist in Spotify
+    # 
+    # @example "spotify:user:benzelano:playlist:starred"
+    # @return [String] The URI for the resource
+    def uri
+      @uri ||= uri_id && "spotify:user:#{user.username}:playlist:#{uri_id}"
+    end
+
     def uri_id #:nodoc:
       @uri_id ||= @uri ? @uri.split(':')[4] : super
+    end
+
+    # The user this playlist is managed by
+    # @return [SpotifyWeb::User]
+    def user
+      @user ||= @uri && client.user(@uri.split(':')[2])
     end
 
     # Loads the attributes for this playlist

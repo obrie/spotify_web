@@ -8,6 +8,23 @@ module SpotifyWeb
   class Album < Resource
     self.metadata_schema = Schema::Metadata::Album
 
+    def self.from_search_result(client, attributes) #:nodoc:
+      attributes = attributes.merge(
+        'artist' => [{
+          :id => attributes['artist_id'],
+          :name => attributes['artist_name']
+        }],
+        'restriction' => [attributes['restrictions']['restriction']].flatten.map do |restriction|
+          {
+            :countries_allowed => restriction['allowed'] && restriction['allowed'].split(',').join,
+            :countries_forbidden => restriction['forbidden'] && restriction['forbidden'].split(',').join
+          }
+        end
+      )
+
+      super
+    end
+
     # The title of the album
     # @return [String]
     attribute :title, :name

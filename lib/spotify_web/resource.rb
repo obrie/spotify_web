@@ -102,6 +102,16 @@ module SpotifyWeb
           result
         end
       end
+
+      # Builds an instance of this resource from the given search result
+      # attributes.  This data often differs from typical metdata results and,
+      # as a result, must be transformed before an instance can be built.
+      # 
+      # @api private
+      # @return [SpotifyWeb::Resource]
+      def from_search_result(client, attributes)
+        new(client, attributes)
+      end
     end
 
     # The characters to encoding / decoding in base62

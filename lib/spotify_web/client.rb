@@ -1,5 +1,6 @@
 require 'fiber'
 require 'execjs'
+require 'multi_xml'
 
 require 'spotify_web/album'
 require 'spotify_web/artist'
@@ -20,6 +21,15 @@ module SpotifyWeb
 
     # The interval with which to send keepalives
     KEEPALIVE_INTERVAL = 180
+
+    # The resource types that can be searched (and their respective values)
+    SEARCH_TYPES = {
+      :songs => {:value => 1, :resource => Song},
+      :albums => {:value => 2, :resource => Album},
+      :artists => {:value => 4, :resource => Artist},
+      :playlists => {:value => 8, :resource => Playlist},
+      :all => {:value => 15}
+    }
 
     # The current authorized user
     # @return [SpotifyWeb::User]
@@ -192,7 +202,11 @@ module SpotifyWeb
     #   client.user               # => #<SpotifyWeb::User username="benze..." ...>
     #   client.user('johnd...')   # => #<SpotifyWeb::User username="johnd..." ...>
     def user(username = nil)
-      username ? User.new(self, :username => username) : @user
+      if !username || username == @user.username
+        @user
+      else
+        User.new(self, :username => username)
+      end
     end
 
     # Builds a new song bound to the given id.
@@ -226,6 +240,51 @@ module SpotifyWeb
     def album(attributes)
       attributes = {:gid => attributes} unless attributes.is_a?(Hash)
       Album.new(self, attributes)
+    end
+
+    # Finds songs / albums / artists / playlists that match the given query.
+    # 
+    # @param [String] query The query string to search for. This should be the song title, artist name, etc.
+    # @param [Hash] options The configuration options for the search
+    # @option options [Symbol] :only The type of resource being looked up.  Default is all resource types.  Valid values include :songs, :albums, :artists, and :playlists.
+    # @option options [Fixnum] :limit (50) The total number of each type of resource to get
+    # @option options [Fixnum] :skip (0) The number of resources to skip when loading the list
+    # @return [Hash, Array<SpotifyWeb::Resource>]
+    # @raise [ArgumentError] if an invalid option is specified
+    # @example
+    #   # General query search
+    #   client.search('Like a Rolling Stone')                   # => {:songs => [...], :albums => [...], ...}
+    #   
+    #   # More accurate, explicit title / artist search
+    #   client.search('Like a Rolling Stone', :only => :songs)  # => [#<SpotifyWeb::Song ...>, ...]
+    def search(query, options = {})
+      assert_valid_keys(options, :only, :limit, :skip)
+      options = {:limit => 50, :skip => 0}.merge(options)
+      assert_valid_values(options[:only], *(SEARCH_TYPES.keys - [:all] + [nil]))
+
+      options[:type] = options.delete(:only) || :all
+
+      search_value = SEARCH_TYPES[options[:type]][:value]
+      response = api('sp/search', [query, search_value, options[:limit], options[:skip]])
+      data = MultiXml.parse(response['result'])['result']
+
+      # Typecast data results to resources
+      results = {}
+      SEARCH_TYPES.each do |type, config|
+        next unless resource_class = config[:resource]
+        resource_name = resource_class.resource_name
+
+        resources_data = data["#{resource_name}s"] ? [data["#{resource_name}s"][resource_name]].flatten : []
+        results[type] = resources_data.map do |resource_data|
+          resource_class.from_search_result(self, resource_data)
+        end
+      end
+
+      if options[:type] == :all
+        results
+      else
+        results[options[:type]]
+      end
     end
 
     private
