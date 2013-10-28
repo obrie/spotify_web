@@ -183,6 +183,18 @@ module SpotifyWeb
       end
     end
 
+    # Gets the current authorized user or builds a new user bound to the given
+    # user id.
+    # 
+    # @param [String] username The name of the user to build
+    # @return [SpotifyWeb::User]
+    # @example
+    #   client.user               # => #<SpotifyWeb::User username="benze..." ...>
+    #   client.user('johnd...')   # => #<SpotifyWeb::User username="johnd..." ...>
+    def user(username = nil)
+      username ? User.new(self, :username => username) : @user
+    end
+
     # Builds a new song bound to the given id.
     # 
     # @param [String, Hash] attributes The id of the song to build or a hash of attributes
