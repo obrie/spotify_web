@@ -12,7 +12,9 @@ module SpotifyWeb
 
     # The catalogue of songs this user is able to access
     # @return [String]
-    attribute :catalogue
+    attribute :catalogue do |value|
+      value.to_sym
+    end
 
     # Gets the authentication settings associated with this user for use with API
     # services.  This will log the user in via username / password if it's not already

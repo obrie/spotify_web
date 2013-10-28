@@ -83,7 +83,7 @@ module SpotifyWeb
     # Whether this song is available to the user
     # @return [Boolean]
     def available?
-      restrictions.all? {|restriction| restriction.permitted?}
+      restrictions.all? {|restriction| restriction.permitted?(:country)}
     end
   end
 end
