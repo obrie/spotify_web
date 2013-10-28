@@ -18,7 +18,7 @@ module SpotifyWeb
     # Whether the user is permitted to access data based on this restriction
     # @return [Boolean]
     def permitted?
-      country = client.user.settings['country']
+      country = client.user.country
 
       if countries_allowed
         countries_allowed.include?(country)

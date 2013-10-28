@@ -8,7 +8,11 @@ module SpotifyWeb
   class AuthorizedUser < User
     # The password associated with the username registered with on Spotify.
     # @return [String]
-    attribute :password
+    attribute :password, :load => false
+
+    # The catalogue of songs this user is able to access
+    # @return [String]
+    attribute :catalogue
 
     # Gets the authentication settings associated with this user for use with API
     # services.  This will log the user in via username / password if it's not already
@@ -19,6 +23,13 @@ module SpotifyWeb
     def settings
       login unless @settings
       @settings
+    end
+
+    # The country this user belongs to and, therefore, the songs they have
+    # access to
+    # @return [String]
+    def country
+      settings['country']
     end
 
     # Logs the user in using the associated e-mail address / password.  This will
@@ -70,6 +81,13 @@ module SpotifyWeb
       raise(ConnectionError, error) if error
 
       true
+    end
+
+    # Loads the attributes for this user
+    def load
+      response = api('sp/user_info')
+      self.attributes = response['result']
+      super
     end
   end
 end

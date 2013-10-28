@@ -1,5 +1,6 @@
 # master
 
+* Add API for looking up additional metadata associated with the current user
 * Add API for searching songs / albums / artists / playlists
 * Allow playlists to be looked up for any user
 * Add API for looking up users
