@@ -1,5 +1,6 @@
 # master
 
+* Add Song#similar for looking up suggested similar songs
 * Fix rake tasks failing to run
 * Track whether a resource is permitted based on its catalogue type
 * Add API for looking up additional metadata associated with the current user

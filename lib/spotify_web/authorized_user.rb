@@ -34,6 +34,12 @@ module SpotifyWeb
       settings['country']
     end
 
+    # The two-letter code for the language currently set for the user
+    # @return [String]
+    def language
+      settings['locale']['current']
+    end
+
     # Logs the user in using the associated e-mail address / password.  This will
     # generate a user id / auth token for authentication with the API services.
     # 

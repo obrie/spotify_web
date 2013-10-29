@@ -1,6 +1,7 @@
 require 'spotify_web/resource'
 require 'spotify_web/album'
 require 'spotify_web/artist'
+require 'spotify_web/schema/bartender.pb'
 require 'spotify_web/schema/metadata.pb'
 
 module SpotifyWeb
@@ -84,6 +85,46 @@ module SpotifyWeb
     # @return [Boolean]
     def available?
       restrictions.all? {|restriction| restriction.permitted?(:country)}
+    end
+
+    # Looks up songs that are similar to the current one
+    # @return [Array<SpotifyWeb::Song>]
+    def similar
+      response = api('request',
+        :uri => "hm://similarity/suggest/#{uri_id}",
+        :payload => Schema::Bartender::StoryRequest.new(
+          :country => client.user.country,
+          :language => client.user.language,
+          :device => 'web'
+        ),
+        :response_schema => Schema::Bartender::StoryList
+      )
+
+      # Build songs based on recommendations
+      songs = response['result'].stories.map do |story|
+        song = story.recommended_item
+        album = song.parent
+        artist = album.parent
+
+        Song.new(client,
+          :uri => song.uri,
+          :name => song.display_name,
+          :album => {
+            :uri => album.uri,
+            :name => album.display_name,
+            :artist => [{
+              :uri => artist.uri,
+              :name => artist.display_name
+            }]
+          },
+          :artist => [{
+            :uri => artist.uri,
+            :name => artist.display_name
+          }]
+        )
+      end
+
+      ResourceCollection.new(client, songs)
     end
   end
 end
