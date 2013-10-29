@@ -14,10 +14,13 @@ module SpotifyWeb
       playlist4meta
       playlist4ops
       radio
-      social
-      socialgraph
       toplist
     )
+
+    SERVICE_URLS = {
+      'socialgraph' => 'https://play.spotify.edgekey.net/apps/follow/1995/proto/socialgraphV2.proto',
+      'bartender' => 'https://play.spotify.edgekey.net/apps/discover/1838/proto/bartender.proto'
+    }
 
     class << self
       # Rebuilds all of the Beecake::Message schema definitions in Spotify.
@@ -96,6 +99,18 @@ module SpotifyWeb
               services[name] = {:name => name, :content => content}
             end
           end
+        end
+
+        # Parse additional services
+        SERVICE_URLS.each do |service, url|
+          request = Net::HTTP::Get.new(url)
+          request['User-Agent'] = SpotifyWeb::USER_AGENT
+          uri = URI(url)
+          response = Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+            http.request(request)
+          end
+
+          services[service] = {:name => service, :content => response.body}
         end
 
         services

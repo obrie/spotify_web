@@ -5,100 +5,56 @@ module SpotifyWeb
   module Schema
     module Socialgraph
 
-      class CountReply
+      module EventType
+        FOLLOW = 1
+        UNFOLLOW = 2
+      end
+
+      class SocialGraphEntity
         include Beefcake::Message
       end
 
-      class UserListRequest
+      class SocialGraphRequest
         include Beefcake::Message
       end
 
-      class UserListReply
+      class SocialGraphReply
         include Beefcake::Message
       end
 
-      class User
+      class ChangeNotification
         include Beefcake::Message
       end
 
-      class ArtistListReply
-        include Beefcake::Message
-      end
-
-      class Artist
-        include Beefcake::Message
-      end
-
-      class StringListRequest
-        include Beefcake::Message
-      end
-
-      class StringListReply
-        include Beefcake::Message
-      end
-
-      class TopPlaylistsRequest
-        include Beefcake::Message
-      end
-
-      class TopPlaylistsReply
-        include Beefcake::Message
-      end
-
-      class CountReply
-        repeated :counts, :int32, 1
+      class SocialGraphEntity
+        optional :user_uri, :string, 1
+        optional :artist_uri, :string, 2
+        optional :followers_count, :int32, 3
+        optional :following_count, :int32, 4
+        optional :status, :int32, 5
+        optional :is_following, :bool, 6
+        optional :is_followed, :bool, 7
+        optional :is_dismissed, :bool, 8
       end
 
 
-      class UserListRequest
-        optional :last_result, :string, 1
-        optional :count, :int32, 2
-        optional :include_length, :bool, 3
+      class SocialGraphRequest
+        repeated :target_uris, :string, 1
+        optional :source_uri, :string, 2
+        optional :include_follower_count, :bool, 4
+        optional :include_following_count, :bool, 5
       end
 
 
-      class UserListReply
-        repeated :users, User, 1
+      class SocialGraphReply
+        repeated :entities, SocialGraphEntity, 1
         optional :length, :int32, 2
       end
 
 
-      class User
-        optional :username, :string, 1
-        optional :subscriber_count, :int32, 2
-        optional :subscription_count, :int32, 3
-      end
-
-
-      class ArtistListReply
-        repeated :artists, Artist, 1
-      end
-
-
-      class Artist
-        optional :artistid, :string, 1
-        optional :subscriber_count, :int32, 2
-      end
-
-
-      class StringListRequest
-        repeated :args, :string, 1
-      end
-
-
-      class StringListReply
-        repeated :reply, :string, 1
-      end
-
-
-      class TopPlaylistsRequest
-        optional :username, :string, 1
-        optional :count, :int32, 2
-      end
-
-
-      class TopPlaylistsReply
-        repeated :uris, :string, 1
+      class ChangeNotification
+        optional :event_type, EventType, 1
+        repeated :entities, SocialGraphEntity, 2
       end
 
     end
