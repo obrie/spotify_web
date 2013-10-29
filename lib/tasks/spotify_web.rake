@@ -1,1 +1,1 @@
-require File.join("#{File.dirname(__FILE__)}/spotify_web)
+require File.join("#{File.dirname(__FILE__)}/spotify_web")

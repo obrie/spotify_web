@@ -1,5 +1,6 @@
 # master
 
+* Fix rake tasks failing to run
 * Track whether a resource is permitted based on its catalogue type
 * Add API for looking up additional metadata associated with the current user
 * Add API for searching songs / albums / artists / playlists
